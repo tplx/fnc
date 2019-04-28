@@ -41,12 +41,12 @@ func preAllocate(f *os.File, size int64) error {
 	err := syscall.Fallocate(int(f.Fd()), fallocate_default, 0, size)
 	if err != nil {
 		errno, ok := err.(syscall.Errno)
-		if !ok {
-			return err
-		}
-		// Go does retry syscall(signal handler set SA_RESTART),
-		// but some platform(caused by bugs) may still return EINTR.
-		if errno == syscall.EINTR {
+		if ok &&
+			// Not support is rare, in case bad news here.
+			(errno == syscall.ENOTSUP ||
+			// Go does retry syscall(signal handler set SA_RESTART),
+			// but some platform(caused by bugs) may still return EINTR.
+			errno == syscall.EINTR) {
 			return f.Truncate(size)
 		}
 	}

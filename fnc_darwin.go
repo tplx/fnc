@@ -15,7 +15,12 @@ func syncRange(f *os.File, off int64, n int64, flags int) (err error) {
 
 	// on darwin even call Sync, the drive may not write dirty page to the media.
 	// It's not a big deal here, because darwin is only for test environment.
-	return f.Sync()
+	// Here sync all data.
+	_, _, errno := syscall.Syscall(syscall.SYS_FCNTL, f.Fd(), uintptr(syscall.F_FULLFSYNC), uintptr(0))
+	if errno == 0 {
+		return nil
+	}
+	return errno
 }
 
 func fadvise(f *os.File, offset, size int64, advice int) (err error) {

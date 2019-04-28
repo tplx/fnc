@@ -88,7 +88,7 @@ const (
 
 // Flush flushes page_cache to disk in sync mode.
 //
-// Filesystem may create a burst of write I/O when dirty pages hit a threshold,
+// OS may create a burst of write I/O when dirty pages hit a threshold,
 // so flush it under users' control maybe a better choice in sometime.
 func Flush(f *os.File, offset, size int64) (err error) {
 
@@ -125,9 +125,5 @@ func DisableReadAhead(f *os.File) (err error) {
 // Preallocate allocates space for a new file.
 // Avoid modify metadata & allocating space in future writing.
 func PreAllocate(f *os.File, size int64) (err error) {
-	err = preAllocate(f, size)
-	if err != nil {
-		return
-	}
-	return f.Sync()
+	return preAllocate(f, size)
 }
