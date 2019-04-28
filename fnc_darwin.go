@@ -5,7 +5,10 @@
 
 package fnc
 
-import "os"
+import (
+	"os"
+	"syscall"
+)
 
 // Disable all File access time(atime) updates,
 // darwin doesn't have it.
