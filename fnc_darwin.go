@@ -7,7 +7,6 @@ package fnc
 
 import (
 	"os"
-	"syscall"
 )
 
 // Disable all File access time(atime) updates,
