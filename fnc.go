@@ -7,7 +7,6 @@ package fnc
 
 import (
 	"os"
-	"path/filepath"
 )
 
 // OpenFile opens a file with O_NOATIME flag.
@@ -15,28 +14,7 @@ func OpenFile(path string, flag int, perm os.FileMode) (f *os.File, err error) {
 
 	flag |= O_NOATIME
 
-	f, err = os.OpenFile(path, flag, perm)
-	if err != nil {
-		return
-	}
-
-	if flag&os.O_CREATE != 0 {
-		if err = SyncDir(filepath.Dir(path)); err != nil {
-			f.Close()
-			return nil, err
-		}
-	}
-
-	return
-}
-
-// Rename call os.Rename then syncs the
-// directory of the newpath.
-func Rename(oldpath, newpath string) error {
-	if err := os.Rename(oldpath, newpath); err != nil {
-		return err
-	}
-	return SyncDir(filepath.Dir(newpath))
+	return os.OpenFile(path, flag, perm)
 }
 
 // Exist returns a file existed or not.
@@ -68,6 +46,7 @@ func ReadDirNames(dir string) ([]string, error) {
 }
 
 // SyncDir syncs the given directory.
+// Call it after rename, create new file etc if you want persist fs metadata.
 // e.g. XFS uses delayed logging, may need SyncDir.
 func SyncDir(dir string) (err error) {
 
